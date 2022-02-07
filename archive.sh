@@ -1,13 +1,13 @@
 #!/bin/bash
 usage(){
 cat << EOF
-Archiving - automated process for exporting bi data to archive
+Archiving - automated process for exportind indices from server to another (archiving)
 
 Usage: ${0##*/} [options] [-iopc]
 
    -h                            Display this help and exit
    -i <server>                   Elasticsearch server input
-   -o <server>                   Elasricsearch server output
+   -o <server>                   Elasticsearch server output
    -p                            flag to port forward es server to localhost
    -c <index name>               Custom archive for only this index
    -f <date from> ex:2021.01.12  date from when to start archiving
@@ -78,6 +78,7 @@ echo "                   to: $OUTPUT_SERVER"
 
 if  ! [ -z "$INDEX" ]
   then
+
     elasticdump \
           --input=http://$INPUT_SERVER/$INDEX \
           --output=http://$OUTPUT_SERVER/$INDEX \
@@ -103,6 +104,8 @@ if  ! [ -z "$INDEX" ]
     fi
   fi
 
+echo $FROM_DATE
+echo $TO_DATE
 #
 #
 # TYPE="-clickout"
