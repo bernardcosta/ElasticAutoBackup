@@ -1,8 +1,8 @@
 usage(){
 cat << EOF
-elastic2csv - automated process for exporting elastic queries to csv files
+Archiving - automated process for exporting bi data to archive
 
-Usage: ${0##*/} [options] [-q QUERY] <json file> [-d DOMAIN] <hostname>
+Usage: ${0##*/} [options] [-iopc]
 
    -h                      Display this help and exit
    -i <server>             Elasticsearch server input
@@ -18,7 +18,6 @@ export $(grep -v '^#' ../.env | xargs)
 
 INPUT_SERVER=${Y02}
 OUTPUT_SERVER=${ARCHIVE}
-OUTPUT="./out/finalExportedData.csv"
 PORT_FORWARD=false
 INDEX=""
 OPTIND=1
@@ -41,6 +40,7 @@ while getopts "hi:o:pc:" opt; do
 if ${PORT_FORWARD} ; then
    # kill ssh tunnel already using this port
    kill $( ps aux | grep '[9]201:' | awk '{print $2}' )
+   kill $( ps aux | grep '[9]202:' | awk '{print $2}' )
    # Port forward remote elasticsearch server
    ssh -f -N -q -L "9201:"$( domain $INPUT_SERVER ) ${SERVER}
    ssh -f -N -q -L "9202:"$( domain $OUTPUT_SERVER ) ${SERVER}
