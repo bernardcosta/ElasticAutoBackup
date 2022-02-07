@@ -1,3 +1,4 @@
+#!/bin/bash
 usage(){
 cat << EOF
 Archiving - automated process for exporting bi data to archive
