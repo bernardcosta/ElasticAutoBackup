@@ -43,6 +43,7 @@ while getopts "hi:o:pc:" opt; do
                exit 1 ;;
        esac
    done
+echo "Archiving dates from: $FROM_DATE to $TO_DATE"
 
 if ${PORT_FORWARD} ; then
    # kill ssh tunnel already using this port
@@ -51,13 +52,13 @@ if ${PORT_FORWARD} ; then
 
    if  ! [ -z "$port1" ]
     then
-      echo "$port1 in use... killing"
+      echo "Port 9201 is in use...killing"
       kill $port1
     fi
 
     if  ! [ -z "$port2" ]
      then
-       echo "$port2 in use... killing"
+       echo "Port 9202 is in use...killing"
        kill $port2
      fi
 
@@ -70,6 +71,37 @@ if ${PORT_FORWARD} ; then
    INPUT_SERVER='localhost:9201'
    OUTPUT_SERVER='localhost:9202'
 fi
+
+echo "Archiving from server: $INPUT_SERVER"
+echo "                   to: $OUTPUT_SERVER"
+
+
+if  ! [ -z "$INDEX" ]
+  then
+    elasticdump \
+          --input=http://$INPUT_SERVER/$INDEX \
+          --output=http://$OUTPUT_SERVER/$INDEX \
+          --type=mapping\
+          --limit=1800
+    elasticdump \
+          --input=http://$INPUT_SERVER/$INDEX \
+          --output=http://$OUTPUT_SERVER/$INDEX \
+          --type=data\
+          --limit=1800
+
+    original_size=$( curl -s -XGET "$INPUT_SERVER/$INDEX/_stats" | jq '._all.primaries.docs.count' )
+    archived_size=$( curl -s -XGET "$OUTPUT_SERVER/$INDEX/_stats" | jq '._all.primaries.docs.count' )
+
+    if [ $original_size = $archived_size ]
+    then
+      echo "Deleting Index from Original server"
+      curl -XDELETE "$INPUT_SERVER/$INDEX"
+    else
+      echo "Warning: Not deleting Index! Backup documents do not match original."
+      echo "    - Original docs: $original_size"
+      echo "    - Archived docs: $archived_size"
+    fi
+  fi
 
 #
 #
