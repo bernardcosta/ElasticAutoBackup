@@ -49,7 +49,12 @@ while getopts "hi:o:pc:f:t:" opt; do
            f)  FROM_DATE=$OPTARG;
                   check_date $FROM_DATE ;;
            t)  TO_DATE=$OPTARG
-                  check_date $TO_DATE;;
+                  check_date $TO_DATE
+                  if [ $(date -f "%Y.%m.%d" -j $FROM_DATE +"%s") -ge $(date -f "%Y.%m.%d" -j $TO_DATE +"%s") ]
+                  then
+                    echo "\"From\" date ($FROM_DATE) cannot be more recent than \"To\" date ($TO_DATE)"
+                    exit 1;
+                  fi;;
            *)  usage >&2
                exit 1 ;;
        esac
