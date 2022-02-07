@@ -19,7 +19,7 @@ EOF
 # export .env files
 export $(grep -v '^#' .env | xargs)
 
-INPUT_SERVER=${Y02}
+INPUT_SERVER=${DEFAULT}
 OUTPUT_SERVER=${ARCHIVE}
 PORT_FORWARD=false
 FROM_DATE=$(date -j -v-14d +"%Y.%m.%d" )
@@ -106,42 +106,3 @@ if  ! [ -z "$INDEX" ]
 
 echo $FROM_DATE
 echo $TO_DATE
-#
-#
-# TYPE="-clickout"
-# if [ $# -eq 3 ]
-# then
-# for i in $(seq $3 $4) ; do
-#
-#     curl -XPOST http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE/_open
-#     echo "\n";
-#     echo "archiving "$1.$(printf %02d $i)$TYPE;
-#
-#     elasticdump \
-#       --input=http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE \
-#       --output=http://$OUTPUT_SERVER/$1.$(printf %02d $i)$TYPE \
-#       --type=mapping\
-#       --limit=1800
-#
-# elasticdump \
-#       --input=http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE \
-#       --output=http://$OUTPUT_SERVER/$1.$(printf %02d $i)$TYPE \
-#       --type=data\
-#       --limit=1800
-#
-#
-# done
-# elif [ $# -eq 1 ]
-# then
-# elasticdump \
-#       --input=http://88.99.151.78:9200/$1 \
-#       --output=http://10.0.1.2:24920/$1 \
-#       --type=mapping\
-#       --limit=1800
-# elasticdump \
-#       --input=http://88.99.151.78:9200/$1 \
-#       --output=http://10.0.1.2:24920/$1 \
-#       --type=data\
-#       --limit=1800
-# fi
-#
