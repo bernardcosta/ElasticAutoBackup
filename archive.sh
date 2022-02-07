@@ -25,6 +25,34 @@ check_date() {
   fi
 }
 
+check_date_range() {
+  if [ $(date -f "%Y.%m.%d" -j $1 +"%s") -ge $(date -f "%Y.%m.%d" -j $2 +"%s") ]
+  then
+    echo "\"From\" date ($1) cannot be more recent than \"To\" date ($2)"
+    exit 1;
+  fi
+}
+
+dump() {
+  limit=1800
+
+  if [ "$#" -eq 4 ]
+    then
+      limit="$4"
+    fi
+
+  elasticdump \
+        --input=http://$1/$3 \
+        --output=http://$2/$3 \
+        --type=mapping\
+        --limit=$limit
+  elasticdump \
+        --input=http://$1/$3 \
+        --output=http://$2/$3 \
+        --type=data\
+        --limit=$limit
+}
+
 # export .env files
 export $(grep -v '^#' .env | xargs)
 
@@ -49,16 +77,12 @@ while getopts "hi:o:pc:f:t:" opt; do
            f)  FROM_DATE=$OPTARG;
                   check_date $FROM_DATE ;;
            t)  TO_DATE=$OPTARG
-                  check_date $TO_DATE
-                  if [ $(date -f "%Y.%m.%d" -j $FROM_DATE +"%s") -ge $(date -f "%Y.%m.%d" -j $TO_DATE +"%s") ]
-                  then
-                    echo "\"From\" date ($FROM_DATE) cannot be more recent than \"To\" date ($TO_DATE)"
-                    exit 1;
-                  fi;;
+                  check_date $TO_DATE;;
            *)  usage >&2
                exit 1 ;;
        esac
    done
+check_date_range ${FROM_DATE} ${TO_DATE}
 echo "Archiving dates from: $FROM_DATE to $TO_DATE"
 
 if ${PORT_FORWARD} ; then
@@ -95,16 +119,7 @@ echo "                   to: $OUTPUT_SERVER"
 if  ! [ -z "$INDEX" ]
   then
 
-    elasticdump \
-          --input=http://$INPUT_SERVER/$INDEX \
-          --output=http://$OUTPUT_SERVER/$INDEX \
-          --type=mapping\
-          --limit=1800
-    elasticdump \
-          --input=http://$INPUT_SERVER/$INDEX \
-          --output=http://$OUTPUT_SERVER/$INDEX \
-          --type=data\
-          --limit=1800
+    dump ${INPUT_SERVER} ${OUTPUT_SERVER} ${INDEX}
 
     original_size=$( curl -s -XGET "$INPUT_SERVER/$INDEX/_stats" | jq '._all.primaries.docs.count' )
     archived_size=$( curl -s -XGET "$OUTPUT_SERVER/$INDEX/_stats" | jq '._all.primaries.docs.count' )
@@ -119,6 +134,3 @@ if  ! [ -z "$INDEX" ]
       echo "    - Archived docs: $archived_size"
     fi
   fi
-
-echo $FROM_DATE
-echo $TO_DATE
