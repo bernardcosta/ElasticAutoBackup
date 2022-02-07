@@ -3,7 +3,7 @@ usage(){
 cat << EOF
 Archiving - automated process for exportind indices from server to another (archiving)
 
-Usage: ${0##*/} [options] [-iopc]
+Usage: ${0##*/} [options] [-iopcft]
 
    -h                            Display this help and exit
    -i <server>                   Elasticsearch server input
@@ -28,7 +28,7 @@ INDEX=""
 OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
-while getopts "hi:o:pc:" opt; do
+while getopts "hi:o:pc:f:t:" opt; do
        case $opt in
            h) usage
               exit 0 ;;
