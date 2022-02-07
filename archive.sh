@@ -51,27 +51,25 @@ if ${PORT_FORWARD} ; then
 
    if  ! [ -z "$port1" ]
     then
+      echo "$port1 in use... killing"
       kill $port1
     fi
 
     if  ! [ -z "$port2" ]
      then
+       echo "$port2 in use... killing"
        kill $port2
      fi
 
    # Port forward remote elasticsearch server
+   echo "Port forwarding: $INPUT_SERVER to localhost:9201"
    ssh -f -N -q -L "9201:"$INPUT_SERVER ${SERVER}
+   echo "Port forwarding: $OUTPUT_SERVER to localhost:9202"
    ssh -f -N -q -L "9202:"$OUTPUT_SERVER ${SERVER}
+
    INPUT_SERVER='localhost:9201'
    OUTPUT_SERVER='localhost:9202'
 fi
-
-echo $FROM_DATE
-echo $TO_DATE
-curl 'localhost:9201'
-
-curl 'localhost:9202'
-
 
 #
 #
