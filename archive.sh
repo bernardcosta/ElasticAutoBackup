@@ -45,4 +45,47 @@ if ${PORT_FORWARD} ; then
    # Port forward remote elasticsearch server
    ssh -f -N -q -L "9201:"$( domain $INPUT_SERVER ) ${SERVER}
    ssh -f -N -q -L "9202:"$( domain $OUTPUT_SERVER ) ${SERVER}
+   INPUT_SERVER='localhost:9201'
+   OUTPUT_SERVER='localhost:9202'
 fi
+
+
+#
+#
+# TYPE="-clickout"
+# if [ $# -eq 3 ]
+# then
+# for i in $(seq $3 $4) ; do
+#
+#     curl -XPOST http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE/_open
+#     echo "\n";
+#     echo "archiving "$1.$(printf %02d $i)$TYPE;
+#
+#     elasticdump \
+#       --input=http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE \
+#       --output=http://$OUTPUT_SERVER/$1.$(printf %02d $i)$TYPE \
+#       --type=mapping\
+#       --limit=1800
+#
+# elasticdump \
+#       --input=http://$INPUT_SERVER/$1.$(printf %02d $i)$TYPE \
+#       --output=http://$OUTPUT_SERVER/$1.$(printf %02d $i)$TYPE \
+#       --type=data\
+#       --limit=1800
+#
+#
+# done
+# elif [ $# -eq 1 ]
+# then
+# elasticdump \
+#       --input=http://88.99.151.78:9200/$1 \
+#       --output=http://10.0.1.2:24920/$1 \
+#       --type=mapping\
+#       --limit=1800
+# elasticdump \
+#       --input=http://88.99.151.78:9200/$1 \
+#       --output=http://10.0.1.2:24920/$1 \
+#       --type=data\
+#       --limit=1800
+# fi
+#
