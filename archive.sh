@@ -16,6 +16,15 @@ Usage: ${0##*/} [options] [-iopcft]
 EOF
 }
 
+check_date() {
+  date -f "%Y.%m.%d" -j "$1" >/dev/null 2>&1 && is_valid=true || is_valid=false
+  if ! ${is_valid}
+    then
+      echo "Date $1 is invalid. Use format: %Y.%m.%d"
+      exit 1;
+  fi
+}
+
 # export .env files
 export $(grep -v '^#' .env | xargs)
 
@@ -37,8 +46,10 @@ while getopts "hi:o:pc:f:t:" opt; do
            o)  OUTPUT_SERVER=$OPTARG ;;
            p)  PORT_FORWARD=true ;;
            c)  INDEX=$OPTARG ;;
-           f)  FROM_DATE=$OPTARG;;
-           t)  TO_DATE=$OPTARG;;
+           f)  FROM_DATE=$OPTARG;
+                  check_date $FROM_DATE ;;
+           t)  TO_DATE=$OPTARG
+                  check_date $TO_DATE;;
            *)  usage >&2
                exit 1 ;;
        esac
