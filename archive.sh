@@ -5,21 +5,25 @@ Archiving - automated process for exporting bi data to archive
 
 Usage: ${0##*/} [options] [-iopc]
 
-   -h                      Display this help and exit
-   -i <server>             Elasticsearch server input
-   -o <server>             Elasricsearch server output
-   -p <true/false>         Whether to port forward or not (useful if done remotely)
-   -c <index name>         Custom archive for only this index
+   -h                            Display this help and exit
+   -i <server>                   Elasticsearch server input
+   -o <server>                   Elasricsearch server output
+   -p                            flag to port forward es server to localhost
+   -c <index name>               Custom archive for only this index
+   -f <date from> ex:2021.01.12  date from when to start archiving
+   -t <date to>   ex:2021.01.12  date to stop archiving at
 
 EOF
 }
 
 # export .env files
-export $(grep -v '^#' ../.env | xargs)
+export $(grep -v '^#' .env | xargs)
 
 INPUT_SERVER=${Y02}
 OUTPUT_SERVER=${ARCHIVE}
 PORT_FORWARD=false
+FROM_DATE=$(date -j -v-14d +"%Y.%m.%d" )
+TO_DATE=$(date -j -v-7d +"%Y.%m.%d" )
 INDEX=""
 OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
@@ -33,6 +37,8 @@ while getopts "hi:o:pc:" opt; do
            o)  OUTPUT_SERVER=$OPTARG ;;
            p)  PORT_FORWARD=true ;;
            c)  INDEX=$OPTARG ;;
+           f)  FROM_DATE=$OPTARG;;
+           t)  TO_DATE=$OPTARG;;
            *)  usage >&2
                exit 1 ;;
        esac
@@ -40,14 +46,31 @@ while getopts "hi:o:pc:" opt; do
 
 if ${PORT_FORWARD} ; then
    # kill ssh tunnel already using this port
-   kill $( ps aux | grep '[9]201:' | awk '{print $2}' )
-   kill $( ps aux | grep '[9]202:' | awk '{print $2}' )
+   port1=$( ps aux | grep '[9]201:' | awk '{print $2}' )
+   port2=$( ps aux | grep '[9]202:' | awk '{print $2}' )
+
+   if  ! [ -z "$port1" ]
+    then
+      kill $port1
+    fi
+
+    if  ! [ -z "$port2" ]
+     then
+       kill $port2
+     fi
+
    # Port forward remote elasticsearch server
-   ssh -f -N -q -L "9201:"$( domain $INPUT_SERVER ) ${SERVER}
-   ssh -f -N -q -L "9202:"$( domain $OUTPUT_SERVER ) ${SERVER}
+   ssh -f -N -q -L "9201:"$INPUT_SERVER ${SERVER}
+   ssh -f -N -q -L "9202:"$OUTPUT_SERVER ${SERVER}
    INPUT_SERVER='localhost:9201'
    OUTPUT_SERVER='localhost:9202'
 fi
+
+echo $FROM_DATE
+echo $TO_DATE
+curl 'localhost:9201'
+
+curl 'localhost:9202'
 
 
 #
