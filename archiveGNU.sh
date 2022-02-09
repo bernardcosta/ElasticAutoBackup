@@ -27,7 +27,7 @@ check_date() {
 }
 
 check_date_range() {
-  if [ $(date +"%s" -d ${FROM_DATE} ) -gt $(date "%s" -d ${TO_DATE}) ]
+  if [ $(date +"%s" -d ${FROM_DATE} ) -gt $(date +"%s" -d ${TO_DATE}) ]
   then
     echo "\"From\" date (${FROM_DATE}) cannot be more recent than \"To\" date (${TO_DATE})"
     exit 1;
