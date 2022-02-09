@@ -142,9 +142,6 @@ fi
 echo "Archiving from server: $INPUT_SERVER"
 echo "                   to: $OUTPUT_SERVER"
 
-NAMES="partner tracking"
-SUFFIXES="clickout intent"
-
 if  ! [ -z "$INDEX" ]
   then
     dump
@@ -153,24 +150,13 @@ if  ! [ -z "$INDEX" ]
     fi
   else
 
-    # for name in $NAMES; do
-    #   if [[ $name = "partner" ]]; then
-    #     for suffix in $SUFFIXES; do
-    #       echo "$name-$FROM_DATE-$suffix"
-    #     done
-    #   else
-    #     echo "$name-$FROM_DATE"
-    #   fi
-    #
-    # done
-
     d=${FROM_DATE}
     while ! [ $d = $(date -v+1d -f "%Y.%m.%d" -j ${TO_DATE} +"%Y.%m.%d") ]; do
       INDEX="partner-"$d"-intent"
       echo ${INDEX}
       dump
       if ${DELETE}; then
-        delete
+        delete_index
       fi
       d=$(date -v+1d -f "%Y.%m.%d" -j $d +"%Y.%m.%d")
     done
