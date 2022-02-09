@@ -1,7 +1,7 @@
 #!/bin/bash
 usage(){
 cat << EOF
-Archiving - automated process for exportind indices from server to another (archiving)
+Archiving - automated process for exportind timestamped indices from server to another (archiving)
 
 Usage: ${0##*/} [options] [-iopcft]
 
@@ -49,7 +49,7 @@ dump() {
     fi
   echo "Opening ${INPUT_SERVER}/${INDEX} if closed..."
   curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
-  echo "Dumping"
+  echo "\nDumping"
 
   elasticdump \
         --input=http://${INPUT_SERVER}/${INDEX} \
@@ -142,23 +142,36 @@ fi
 echo "Archiving from server: $INPUT_SERVER"
 echo "                   to: $OUTPUT_SERVER"
 
+NAMES="partner tracking"
+SUFFIXES="clickout intent"
 
 if  ! [ -z "$INDEX" ]
   then
     dump
-
-    if ${DELETE}
-    then
+    if ${DELETE}; then
       delete
     fi
   else
-    d=${FROM_DATE}
-    while ! [ $d = $(date -v+1d -f "%Y.%m.%d" -j ${TO_DATE} +"%Y.%m.%d") ]
-    do
 
+    # for name in $NAMES; do
+    #   if [[ $name = "partner" ]]; then
+    #     for suffix in $SUFFIXES; do
+    #       echo "$name-$FROM_DATE-$suffix"
+    #     done
+    #   else
+    #     echo "$name-$FROM_DATE"
+    #   fi
+    #
+    # done
+
+    d=${FROM_DATE}
+    while ! [ $d = $(date -v+1d -f "%Y.%m.%d" -j ${TO_DATE} +"%Y.%m.%d") ]; do
       INDEX="partner-"$d"-intent"
       echo ${INDEX}
       dump
+      if ${DELETE}; then
+        delete
+      fi
       d=$(date -v+1d -f "%Y.%m.%d" -j $d +"%Y.%m.%d")
     done
   fi
