@@ -27,10 +27,17 @@ check_date() {
 }
 
 check_date_range() {
-  if [ $(date -f "%Y.%m.%d" -j ${FROM_DATE} +"%s") -ge $(date -f "%Y.%m.%d" -j ${TO_DATE} +"%s") ]
+  if [ $(date -f "%Y.%m.%d" -j ${FROM_DATE} +"%s") -gt $(date -f "%Y.%m.%d" -j ${TO_DATE} +"%s") ]
   then
     echo "\"From\" date (${FROM_DATE}) cannot be more recent than \"To\" date (${TO_DATE})"
     exit 1;
+  else
+    # Convert to seconds
+    to=$(date -f "%Y.%m.%d" -j ${TO_DATE} +"%s")
+    from=$(date -f "%Y.%m.%d" -j ${FROM_DATE} +"%s")
+
+    # Get difference between dates in days
+    echo "Total days to archive: "$(( ( ($to - $from) / (60 * 60 * 24) )+1 ))
   fi
 }
 
@@ -40,6 +47,9 @@ dump() {
     then
       limit="$1"
     fi
+  echo "Opening ${INPUT_SERVER}/${INDEX} if closed..."
+  curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
+  echo "Dumping"
 
   elasticdump \
         --input=http://${INPUT_SERVER}/${INDEX} \
@@ -70,7 +80,6 @@ delete_index(){
 
 # export .env files
 export $(grep -v '^#' .env | xargs)
-
 INPUT_SERVER=${DEFAULT}
 OUTPUT_SERVER=${ARCHIVE}
 PORT_FORWARD=false
@@ -142,4 +151,14 @@ if  ! [ -z "$INDEX" ]
     then
       delete
     fi
+  else
+    d=${FROM_DATE}
+    while ! [ $d = $(date -v+1d -f "%Y.%m.%d" -j ${TO_DATE} +"%Y.%m.%d") ]
+    do
+
+      INDEX="partner-"$d"-intent"
+      echo ${INDEX}
+      dump
+      d=$(date -v+1d -f "%Y.%m.%d" -j $d +"%Y.%m.%d")
+    done
   fi
