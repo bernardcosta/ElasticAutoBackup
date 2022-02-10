@@ -47,7 +47,8 @@ dump() {
     then
       limit="$1"
     fi
-  echo "Opening ${INPUT_SERVER}/${INDEX} if closed..."
+
+  # Checking if index is open. and opens it if closed
   curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
   echo "\nDumping"
 
