@@ -71,6 +71,8 @@ delete_index(){
   then
     echo "Deleting Index from Original server"
     curl -XDELETE "$INPUT_SERVER/$INDEX"
+    ehcho "\n"
+
   else
     echo "Warning: Not deleting Index! Backup documents do not match original."
     echo "    - Original docs: $original_size"
@@ -139,6 +141,8 @@ fi
 
 echo "Archiving from server: $INPUT_SERVER"
 echo "                   to: $OUTPUT_SERVER"
+echo "======================================"
+
 
 if  ! [ -z "$INDEX" ]
   then

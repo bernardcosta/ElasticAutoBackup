@@ -47,7 +47,8 @@ dump() {
     then
       limit="$1"
     fi
-  echo "Opening ${INPUT_SERVER}/${INDEX} if closed..."
+
+  # Checking if index is open. and opens it if not
   curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
   echo "\nDumping"
 
@@ -71,6 +72,7 @@ delete_index(){
   then
     echo "Deleting Index from Original server"
     curl -XDELETE "$INPUT_SERVER/$INDEX"
+    ehcho "\n"
   else
     echo "Warning: Not deleting Index! Backup documents do not match original."
     echo "    - Original docs: $original_size"
@@ -139,6 +141,7 @@ fi
 
 echo "Archiving from server: $INPUT_SERVER"
 echo "                   to: $OUTPUT_SERVER"
+echo "======================================"
 
 if  ! [ -z "$INDEX" ]
   then
@@ -150,12 +153,10 @@ if  ! [ -z "$INDEX" ]
     check_date_range
     echo "Archiving dates from: $FROM_DATE to $TO_DATE"
 
-
     d=$( date -d "${FROM_DATE}" +"%Y-%m-%d")
     while ! [ $d = $( date -d "${TO_DATE} + 1 day" +"%Y-%m-%d") ]; do
       INDEX="partner-"$(date -d "$d" +"%Y.%m.%d")"-intent"
       echo ${INDEX}
-      echo $d
       dump
       if ${DELETE}; then
         delete_index
