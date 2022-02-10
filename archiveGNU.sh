@@ -108,8 +108,6 @@ while getopts "hi:o:pc:f:t:d" opt; do
                exit 1 ;;
        esac
    done
-check_date_range
-echo "Archiving dates from: $FROM_DATE to $TO_DATE"
 
 if ${PORT_FORWARD}
  then
@@ -149,6 +147,9 @@ if  ! [ -z "$INDEX" ]
       delete
     fi
   else
+    check_date_range
+    echo "Archiving dates from: $FROM_DATE to $TO_DATE"
+
 
     d=$( date -d "${FROM_DATE}" +"%Y-%m-%d")
     while ! [ $d = $( date -d "${TO_DATE} + 1 day" +"%Y-%m-%d") ]; do
