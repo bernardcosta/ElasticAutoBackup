@@ -144,7 +144,7 @@ if  ! [ -z "$INDEX" ]
   then
     dump
     if ${DELETE}; then
-      delete
+      delete_index
     fi
   else
     check_date_range
