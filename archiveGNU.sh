@@ -144,6 +144,7 @@ echo "                   to: $OUTPUT_SERVER"
 echo "======================================"
 
 if  ! [ -z "$INDEX" ]
+  echo ${INDEX}
   then
     dump
     if ${DELETE}; then
