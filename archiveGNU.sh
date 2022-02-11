@@ -81,6 +81,7 @@ delete_index(){
 
 # export .env files
 export $(grep -v '^#' .env | xargs)
+
 INPUT_SERVER=${DEFAULT}
 OUTPUT_SERVER=${ARCHIVE}
 PORT_FORWARD=false
@@ -151,15 +152,27 @@ if  ! [ -z "$INDEX" ]
   else
     check_date_range
     echo "Archiving dates from: $FROM_DATE to $TO_DATE"
-
+    IFS=,
     d=$( date -d "${FROM_DATE}" +"%Y-%m-%d")
     while ! [ $d = $( date -d "${TO_DATE} + 1 day" +"%Y-%m-%d") ]; do
-      INDEX="partner-"$(date -d "$d" +"%Y.%m.%d")"-intent"
-      echo ${INDEX}
-      dump
-      if ${DELETE}; then
-        delete_index
-      fi
+      for name in ${NAMES}; do
+        if [[ $name == "partner" ]]; then
+          for ss in ${SUFFIX}; do
+            INDEX="$name-$d-$ss"
+            dump
+            if ${DELETE}; then
+              delete_index
+            fi
+          done
+        else
+          INDEX="$name-$(date -d $d +%Y.%m.%d)"
+          echo ${INDEX}
+          dump
+          if ${DELETE}; then
+            delete_index
+          fi
+        fi
+      done
       d=$(date -d "$d + 1 day" +"%Y-%m-%d" )
 
     done
