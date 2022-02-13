@@ -144,8 +144,8 @@ echo "                   to: $OUTPUT_SERVER"
 echo "======================================"
 
 if  ! [ -z "$INDEX" ]
-  echo ${INDEX}
   then
+    echo ${INDEX}
     dump
     if ${DELETE}; then
       delete_index
@@ -153,6 +153,7 @@ if  ! [ -z "$INDEX" ]
   else
     check_date_range
     echo "Archiving dates from: $FROM_DATE to $TO_DATE"
+    
     IFS=,
     d=$( date -d "${FROM_DATE}" +"%Y-%m-%d")
     while ! [ $d = $( date -d "${TO_DATE} + 1 day" +"%Y-%m-%d") ]; do
