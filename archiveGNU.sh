@@ -49,7 +49,7 @@ dump() {
     fi
   # Checking if index is open. and opens it if closed
   curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
-  echo "\nDumping ${INDEX}"
+  echo -e "\nDumping ${INDEX}"
 
   elasticdump \
         --input=http://${INPUT_SERVER}/${INDEX} \
@@ -71,7 +71,7 @@ delete_index(){
   then
     echo "Deleting Index from Original server"
     curl -XDELETE "$INPUT_SERVER/$INDEX"
-    echo "\n"
+    echo -e "\n"
   else
     echo "Warning: Not deleting Index! Backup documents do not match original."
     echo "    - Original docs: $original_size"
