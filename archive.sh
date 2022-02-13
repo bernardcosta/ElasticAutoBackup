@@ -50,7 +50,7 @@ dump() {
 
   # Checking if index is open. and opens it if closed
   curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
-  echo "\nDumping"
+  echo "\nDumping ${INDEX}"
 
   elasticdump \
         --input=http://${INPUT_SERVER}/${INDEX} \
