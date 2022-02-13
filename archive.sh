@@ -166,18 +166,18 @@ if  ! [ -z "$INDEX" ]
           for ss in ${SUFFIX}; do
             INDEX="$name-$d-$ss"
             echo $INDEX
-            # dump
-            # if ${DELETE}; then
-            #   delete_index
-            # fi
+            dump
+            if ${DELETE}; then
+              delete_index
+            fi
           done
         else
           INDEX="$name-$d"
           echo $INDEX
-          # dump
-          # if ${DELETE}; then
-          #   delete_index
-          # fi
+          dump
+          if ${DELETE}; then
+            delete_index
+          fi
         fi
       done
 

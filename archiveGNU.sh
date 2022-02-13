@@ -154,8 +154,8 @@ if  ! [ -z "$INDEX" ]
     check_date_range
     echo "Archiving dates from: $FROM_DATE to $TO_DATE"
     
-    IFS=,
     d=$( date -d "${FROM_DATE}" +"%Y-%m-%d")
+    IFS=,
     while ! [ $d = $( date -d "${TO_DATE} + 1 day" +"%Y-%m-%d") ]; do
       for name in ${NAMES}; do
         if [[ $name == "partner" ]]; then
