@@ -7,7 +7,7 @@ There are two scripts doing the same procedure. One uses GNU `date` (to run on l
 
 ## Usage
 
-##### To archive a single index
+### To archive a single index
 
 Example:
 
@@ -35,7 +35,7 @@ Example:
   SERVER=user@hostname
   ```
 
-##### To batch archive indices based on date range
+### To batch archive indices based on date range
 
 If indices are of the form `index-2019.01.01` then the below example will batch archive these indices one after the other:
 
