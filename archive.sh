@@ -49,19 +49,25 @@ dump() {
     fi
 
   # Checking if index is open. and opens it if closed
-  curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open"
-  echo -e "\nDumping ${INDEX}"
+  exists=$( curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}/_open")
 
-  elasticdump \
-        --input=http://${INPUT_SERVER}/${INDEX} \
-        --output=http://${OUTPUT_SERVER}/${INDEX} \
-        --type=mapping\
-        --limit=$limit
-  elasticdump \
-        --input=http://${INPUT_SERVER}/${INDEX} \
-        --output=http://${OUTPUT_SERVER}/${INDEX} \
-        --type=data\
-        --limit=$limit
+  if ! [[ $exists == "index_not_found_exception" ]] ; then
+    echo -e "\nIndex ${INDEX} does not exist. skipping..."
+  else
+    echo -e "\nDumping ${INDEX}"
+
+    elasticdump \
+          --input=http://${INPUT_SERVER}/${INDEX} \
+          --output=http://${OUTPUT_SERVER}/${INDEX} \
+          --type=mapping\
+          --limit=$limit
+    elasticdump \
+          --input=http://${INPUT_SERVER}/${INDEX} \
+          --output=http://${OUTPUT_SERVER}/${INDEX} \
+          --type=data\
+          --limit=$limit
+  fi
+
 }
 
 delete_index(){
