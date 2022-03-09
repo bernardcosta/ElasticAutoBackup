@@ -147,6 +147,7 @@ fi
 echo "Archiving from server: $INPUT_SERVER"
 echo "                   to: $OUTPUT_SERVER"
 echo "======================================"
+date
 
 if  ! [ -z "$INDEX" ]
   then
