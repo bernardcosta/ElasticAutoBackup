@@ -49,7 +49,7 @@ dump() {
     fi
 
   # Checking if index is open. and opens it if closed
-  exists=$( curl -s -XPOST "http://${INPUT_SERVER}/${INDEX}")
+  exists=$( curl -s -XGET "http://${INPUT_SERVER}/${INDEX}")
 
   if ! [[ $exists == *"index_not_found_exception"* ]] ; then
     echo -e "\nIndex ${INDEX} does not exist. skipping..."
