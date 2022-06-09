@@ -49,11 +49,33 @@ dump() {
     fi
 
   # Checking if index is open. and opens it if closed
-  exists=$( curl -s -XGET "http://${INPUT_SERVER}/${INDEX}")
+  exists=$( curl -s -XGET "http://${INPUT_SERVER}/_cat/indices/${INDEX}")
+ #  echo -e $exists
+ #  if [[ $exists ]] ; then
+ #   open=$( curl -s -X POST "http://${INPUT_SERVER}/${INDEX}/_open?pretty" )
+ #   echo -e $open
+ # fi
+
 
   if [[ $exists == *"index_not_found_exception"* ]] ; then
     echo -e "\nIndex ${INDEX} does not exist. skipping..."
+    exit 1 ;
   else
+    isClosed=$( curl -s -XGET "http://${INPUT_SERVER}/_cat/indices/${INDEX}" | grep ' close ')
+    if [[ $isClosed ]] ; then
+      echo -e "Index is Closed ... Opening"
+      opened=$( curl -s -X POST "http://${INPUT_SERVER}/${INDEX}/_open?pretty" | grep '"acknowledged" : true')
+      if [[ $opened ]] ; then
+        echo -e "Opened"
+      else
+        echo -e "Index did not open.. stopping"
+        exit 1;
+      fi
+    else
+      echo -e "Index already open"
+    fi
+    # echo -e $(curl -s -X GET "http://${INPUT_SERVER}/${INDEX}")
+
     echo -e "\nDumping ${INDEX}"
 
     elasticdump \
